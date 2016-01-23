@@ -22,7 +22,7 @@ func main() {
 			resp.Header().Set("Status", "500 Internal Server Error")
 			message := map[string]string{}
 			message["message"] = "Internal Server Error"
-			emessage, err := json.Marshal(message)
+			emessage, err := json.MarshalIndent(message, "", "\t")
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -37,7 +37,7 @@ func main() {
 			log.Fatal(err)
 		}
 		metamap := MetaParser(doc)
-		result, err := json.Marshal(metamap)
+		result, err := json.MarshalIndent(metamap, "", "\t")
 		if err != nil {
 			log.Fatal(err)
 		}
