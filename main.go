@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"golang.org/x/net/html"
 	"log"
@@ -39,6 +40,10 @@ func main() {
 		}
 	}
 	f(doc)
-	// fmt.Printf("%v", metas)
-	fmt.Println(metas["google-site-verification"])
+
+	result, err := json.Marshal(metas)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("%s\n", result)
 }
