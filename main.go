@@ -10,14 +10,29 @@ import (
 
 func main() {
 
-	http.HandleFunc("/url", func(w http.ResponseWriter, r *http.Request) {
-		// fmt.Fprintf(w, "Hello, %q", html.EscapeString(r.URL.Path))
-		resp, err := http.Get("https://github.com/")
+	http.HandleFunc("/fetch", func(resp http.ResponseWriter, req *http.Request) {
+		// fmt.Fprintf(resp, "Hello, %q", html.EscapeString(req.URL.Path))
+
+		resp.Header().Set("Content-Type", "application/json")
+
+		getresp, err := http.Get(req.FormValue("url"))
+
 		if err != nil {
-			log.Fatal(err)
+			// log.Fatal(err)
+			resp.Header().Set("Status", "500 Internal Server Error")
+			message := map[string]string{}
+			message["message"] = "Internal Server Error"
+			emessage, err := json.Marshal(message)
+			if err != nil {
+				log.Fatal(err)
+			}
+			fmt.Fprintf(resp, "%s\n", emessage)
+			return
+		} else {
+			defer getresp.Body.Close()
 		}
-		defer resp.Body.Close()
-		doc, err := html.Parse(resp.Body)
+
+		doc, err := html.Parse(getresp.Body)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -26,9 +41,8 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		// fmt.printf("%s\n", result)
-		w.Header().Set("Content-Type", "application/json")
-		fmt.Fprintf(w, "%s\n", result)
+
+		fmt.Fprintf(resp, "%s\n", result)
 	})
 
 	http.Handle("/", http.FileServer(http.Dir("./public")))

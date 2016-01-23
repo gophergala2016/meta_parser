@@ -16,7 +16,7 @@
 <pre id="results"></pre>
 <script>
   function fetchRepos(url) {
-    fetch('/url')
+    fetch('/fetch?url=' + url)
     .then(function(response) {
       return response.json();
     }).then(function(res) {
