@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Meta Parser</title>
+  <style type="text/css">
+    body {
+      max-width: 300px;
+    }
+    pre {
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+<input type="url" id="url" name="url" value="" autofocus>
+<pre id="results"></pre>
+<script>
+  function fetchRepos(url) {
+    fetch('/url')
+    .then(function(response) {
+      return response.json();
+    }).then(function(res) {
+      var results = document.getElementById('results');
+      results.innerHTML = JSON.stringify(res); // replace content
+      window.previousVal = url;
+    }).catch(function(err) {
+      console.error(err);
+    });
+  }
+  window.previousVal = null;
+  document.addEventListener('DOMContentLoaded', function () {
+    var input = document.getElementById('url');
+    input.addEventListener('keyup', function() {
+      var val = this.value;
+      // clear the timeout so we dont fire in succession
+      clearTimeout(this.delayer);
+      this.delayer = setTimeout(function () {
+        if (val != window.previousVal) {
+          fetchRepos(val);
+        } else {
+          console.log('repeat call blocked');
+        }
+      }, 1000);
+    });
+  })
+</script>
+</body>
+</html>

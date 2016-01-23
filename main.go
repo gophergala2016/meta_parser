@@ -9,41 +9,29 @@ import (
 )
 
 func main() {
-	resp, err := http.Get("https://github.com/")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer resp.Body.Close()
-	doc, err := html.Parse(resp.Body)
-	if err != nil {
-		log.Fatal(err)
-	}
-	metas := map[string]string{}
-	var f func(*html.Node)
-	f = func(n *html.Node) {
-		if n.Type == html.ElementNode && n.Data == "meta" {
-			name, content := "", ""
-			for _, a := range n.Attr {
-				if a.Key == "name" {
-					name = a.Val
-				}
-				if a.Key == "content" {
-					content = a.Val
-				}
-			}
-			if name != "" && content != "" {
-				metas[name] = content
-			}
-		}
-		for c := n.FirstChild; c != nil; c = c.NextSibling {
-			f(c)
-		}
-	}
-	f(doc)
 
-	result, err := json.Marshal(metas)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Printf("%s\n", result)
+	http.HandleFunc("/url", func(w http.ResponseWriter, r *http.Request) {
+		// fmt.Fprintf(w, "Hello, %q", html.EscapeString(r.URL.Path))
+		resp, err := http.Get("https://github.com/")
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer resp.Body.Close()
+		doc, err := html.Parse(resp.Body)
+		if err != nil {
+			log.Fatal(err)
+		}
+		metamap := MetaParser(doc)
+		result, err := json.Marshal(metamap)
+		if err != nil {
+			log.Fatal(err)
+		}
+		// fmt.printf("%s\n", result)
+		w.Header().Set("Content-Type", "application/json")
+		fmt.Fprintf(w, "%s\n", result)
+	})
+
+	http.Handle("/", http.FileServer(http.Dir("./public")))
+
+	log.Fatal(http.ListenAndServe(":4000", nil))
 }
