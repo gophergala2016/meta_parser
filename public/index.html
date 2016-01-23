@@ -4,16 +4,27 @@
   <title>Meta Parser</title>
   <style type="text/css">
     body {
-      max-width: 300px;
+      max-width: 900px;
     }
-    pre {
-      white-space: pre-wrap;
+    #results {
+      margin: 1em 0;
+    }
+    .left {
+      float: left;
+      width: 260px;
+      margin-left: 1em;
     }
   </style>
 </head>
 <body>
 <input type="url" id="url" name="url" value="" autofocus>
-<pre id="results"></pre>
+<div id="results">
+  <img src="" id="meta_image" align="left">
+  <div class="left">
+    <h2 id="meta_title"></h2>
+    <p id="meta_description"></p>
+  </div>
+</div>
 <script>
   function fetchRepos(url) {
     fetch('/fetch?url=' + url)
@@ -21,7 +32,10 @@
       return response.json();
     }).then(function(res) {
       var results = document.getElementById('results');
-      results.innerHTML = JSON.stringify(res); // replace content
+      results.innerHTML = "<img src=\"\" id=\"meta_image\" align=\"left\"><div class=\"left\"><h2 id=\"meta_title\"></h2><p id=\"meta_description\"></p></div>";
+      document.getElementById('meta_image').src = res['twitter:image:src'];
+      document.getElementById('meta_title').innerHTML = res['twitter:title'];
+      document.getElementById('meta_description').innerHTML = res['twitter:description'];
       window.previousVal = url;
     }).catch(function(err) {
       console.error(err);
