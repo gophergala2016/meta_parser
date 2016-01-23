@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	resp, err := http.Get("https://github.com/")
+	resp, err := http.Get("https://example.com/")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -17,27 +17,27 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	// metas := map[string]string{}
+	metas := map[string]string{}
 	var f func(*html.Node)
 	f = func(n *html.Node) {
 		if n.Type == html.ElementNode && n.Data == "meta" {
-			fmt.Println(n.Attr)
-			//for _, a := range n.Attr {
-			//fmt.Println(a.Key)
-			// if a.Key == "name" {
-			// 	fmt.Println("name: ", a.Val)
-			// 	break
-			// }
-			// if a.Key == "content" {
-			// 	fmt.Println("content: ", a.Val)
-			// 	break
-			// }
-			//}
+			name, content := "", ""
+			for _, a := range n.Attr {
+				if a.Key == "name" {
+					name = a.Val
+				}
+				if a.Key == "content" {
+					content = a.Val
+				}
+			}
+			if name != "" && content != "" {
+				metas[name] = content
+			}
 		}
 		for c := n.FirstChild; c != nil; c = c.NextSibling {
 			f(c)
 		}
-		// fmt.Printf("%v", metas)
 	}
 	f(doc)
+	fmt.Printf("%v", metas)
 }
