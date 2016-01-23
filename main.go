@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	resp, err := http.Get("https://example.com/")
+	resp, err := http.Get("https://github.com/")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -39,5 +39,6 @@ func main() {
 		}
 	}
 	f(doc)
-	fmt.Printf("%v", metas)
+	// fmt.Printf("%v", metas)
+	fmt.Println(metas["google-site-verification"])
 }
